@@ -7,10 +7,16 @@ export async function GET(request: Request) {
   const sort = searchParams.get('sort') || 'hot'; // hot, new, top, rising
   const limit = Math.min(parseInt(searchParams.get('limit') || '15', 10), 25);
 
-  // prefer the official api.reddit.com endpoint (less likely to be blocked by security / hosting policies)
-  // avoid old.reddit.com where Vercel and cloud workers are often blocked.
+  // prefer the official api.reddit.com endpoint (less likely to be blocked by hosting policies)
   const redditHosts = ['https://api.reddit.com', 'https://www.reddit.com'];
   const query = `/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`;
+
+  // if direct fetch fails on Vercel, fall back to public proxies (best-effort)
+  const proxyPrefixes = [
+    'https://api.allorigins.win/raw?url=',
+    'https://thingproxy.freeboard.io/fetch/',
+    'https://cors.bridged.cc/',
+  ];
 
   function getUserAgent() {
     return (
@@ -51,6 +57,34 @@ export async function GET(request: Request) {
         }
       } catch (subError) {
         lastError = `Fetch failed for ${host}: ${(subError as Error).message}`;
+      }
+    }
+
+    // If both official hosts fail, attempt public HTTP proxy to bypass Vercel network blocks
+    if (!response || !response.ok) {
+      for (const proxy of proxyPrefixes) {
+        try {
+          const proxyUrl = `${proxy}${encodeURIComponent(`https://api.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`)}`;
+          response = await fetch(proxyUrl, {
+            headers: {
+              'User-Agent': getUserAgent(),
+              'Accept': 'application/json',
+            },
+            next: { revalidate: 300 },
+          });
+          if (response.ok) break;
+
+          const body = await response.text().catch(() => '<unreadable body>');
+          const blockedContent = /<html|<body|whoa there, pardner!/i.test(body);
+          lastError = `Proxy API unavailable from ${proxyUrl}: ${response.status} ${response.statusText} - ${blockedContent ? 'blocked by network policy' : body}`;
+
+          if (!blockedContent && response.status !== 403 && response.status !== 429) {
+            break;
+          }
+        } catch (proxyError) {
+          lastError = `Proxy fetch failed for ${proxy}: ${(proxyError as Error).message}`;
+          continue;
+        }
       }
     }
 

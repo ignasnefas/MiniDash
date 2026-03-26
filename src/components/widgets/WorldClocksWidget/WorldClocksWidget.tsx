@@ -60,7 +60,7 @@ export default function WorldClocksWidget() {
     setZones(prev => prev.filter(z => z !== zone));
   };
 
-  const activeNow = now ?? new Date();
+  const activeNow = now;
   const statusText = now ? `Updated: ${now.toLocaleTimeString()}` : 'Updated: --:--:--';
 
   return (
@@ -77,7 +77,7 @@ export default function WorldClocksWidget() {
           ) : (
             zones.map((z) => (
               <div key={z} className={styles.row}>
-                <div className={styles.time}>{formatTime(activeNow, z)}</div>
+                <div className={styles.time}>{activeNow ? formatTime(activeNow, z) : '--:--:--'}</div>
                 <div className={styles.zone}>{z}</div>
                 <button className={styles.remove} onClick={() => removeZone(z)}>✕</button>
               </div>

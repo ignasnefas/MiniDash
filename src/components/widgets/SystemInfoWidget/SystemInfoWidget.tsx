@@ -4,14 +4,50 @@ import { useState, useEffect } from 'react';
 import TerminalBox from '@/components/ui/TerminalBox';
 import styles from './SystemInfoWidget.module.css';
 
-const ASCII_ART = `
+const DEFAULT_ASCII_ART = `
        .---.
-      /     \\
+      /     \
      | () () |
-      \\  ^  /
+      \  ^  /
        |||||
        |||||
 `;
+
+function getOsAsciiArt(os: string) {
+  const key = os.toLowerCase();
+  if (key.includes('windows')) {
+    return `
+      [Windows]
+      _________
+     |  _   _  |
+     | (_) (_) |
+     |   ___   |
+     |__|   |__|
+    `;
+  }
+  if (key.includes('mac') || key.includes('darwin')) {
+    return `
+      [macOS]
+       _____
+      /  _  \
+     |  /_\  |
+     |  \_/  |
+      \_____/
+    `;
+  }
+  if (key.includes('linux')) {
+    return `
+      [Linux]
+       .--.
+      |o_o |
+      |:_/ |
+      |\_/ |
+      |   |\
+      |___|/
+    `;
+  }
+  return DEFAULT_ASCII_ART;
+}
 
 function getWebGLInfo() {
   try {
@@ -181,7 +217,6 @@ export default function SystemInfoWidget() {
       status={`Uptime: ${formatUptime(uptime)}`}
     >
       <div className={styles.container}>
-        <pre className={styles.ascii}>{ASCII_ART}</pre>
         <div className={styles.info}>
           <div className={styles.infoLine}>
             <span className={styles.label}>OS:</span>
