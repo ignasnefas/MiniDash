@@ -25,6 +25,45 @@ export async function GET(request: Request) {
     );
   }
 
+  type ValidateJsonResponseResult =
+    | { ok: true; text: string }
+    | { ok: false; reason: string; body: string };
+
+  async function validateJsonResponse(resp: Response): Promise<ValidateJsonResponseResult> {
+    const contentType = resp.headers.get('content-type') || '';
+    const text = await resp.text().catch(() => '');
+    const isHtml = /<html|<body|<!doctype html/i.test(text);
+
+    if (!resp.ok) {
+      return {
+        ok: false,
+        reason: `HTTP ${resp.status} ${resp.statusText}`,
+        body: text,
+      };
+    }
+
+    if (!contentType.includes('application/json')) {
+      return {
+        ok: false,
+        reason: `Invalid content-type: ${contentType}`,
+        body: text,
+      };
+    }
+
+    if (isHtml) {
+      return {
+        ok: false,
+        reason: 'Received HTML body (likely blocked page)',
+        body: text,
+      };
+    }
+
+    return {
+      ok: true,
+      text,
+    };
+  }
+
   async function fetchFromHost(host: string) {
     const redditUrl = `${host}${query}`;
     const response = await fetch(redditUrl, {
@@ -40,19 +79,22 @@ export async function GET(request: Request) {
   try {
     let response: Response | null = null;
     let lastError: string | null = null;
+    let redditBody: string | null = null;
 
     for (const host of redditHosts) {
       try {
         response = await fetchFromHost(host);
-        if (response.ok) break;
+        const validation = await validateJsonResponse(response);
 
-        const body = await response.text().catch(() => '<unreadable body>');
-        const blockedContent = /<html|<body|whoa there, pardner!/i.test(body);
+        if (validation.ok) {
+          redditBody = validation.text;
+          break;
+        }
 
-        lastError = `Reddit API unavailable from ${host}: ${response.status} ${response.statusText} - ${blockedContent ? 'blocked by network policy' : body}`;
+        lastError = `Reddit API unavailable from ${host}: ${validation.reason} - ${validation.body?.slice(0, 512)}`;
 
-        // Retry with next host on 403/429 or HTML-blocked pages
-        if (!blockedContent && response.status !== 403 && response.status !== 429) {
+        if (response.status !== 403 && response.status !== 429) {
+          // If non-rate-limited error (e.g. 404), no need to keep retrying
           break;
         }
       } catch (subError) {
@@ -61,7 +103,7 @@ export async function GET(request: Request) {
     }
 
     // If both official hosts fail, attempt public HTTP proxy to bypass Vercel network blocks
-    if (!response || !response.ok) {
+    if (!redditBody) {
       for (const proxy of proxyPrefixes) {
         try {
           const proxyUrl = `${proxy}${encodeURIComponent(`https://api.reddit.com/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`)}`;
@@ -72,15 +114,15 @@ export async function GET(request: Request) {
             },
             next: { revalidate: 300 },
           });
-          if (response.ok) break;
 
-          const body = await response.text().catch(() => '<unreadable body>');
-          const blockedContent = /<html|<body|whoa there, pardner!/i.test(body);
-          lastError = `Proxy API unavailable from ${proxyUrl}: ${response.status} ${response.statusText} - ${blockedContent ? 'blocked by network policy' : body}`;
-
-          if (!blockedContent && response.status !== 403 && response.status !== 429) {
-            break;
+          const validation = await validateJsonResponse(response);
+          if (!validation.ok) {
+            lastError = `Proxy API unavailable from ${proxyUrl}: ${validation.reason} - ${validation.body?.slice(0, 512)}`;
+            continue;
           }
+
+          redditBody = validation.text;
+          break;
         } catch (proxyError) {
           lastError = `Proxy fetch failed for ${proxy}: ${(proxyError as Error).message}`;
           continue;
@@ -88,11 +130,16 @@ export async function GET(request: Request) {
       }
     }
 
-    if (!response || !response.ok) {
+    if (!redditBody) {
       throw new Error(lastError || 'Unknown Reddit fetch failure');
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(redditBody);
+    } catch (parseError) {
+      throw new Error(`Failed to parse Reddit JSON response: ${(parseError as Error).message}`);
+    }
 
     const children = data?.data?.children ?? [];
     const posts: RedditPost[] = Array.isArray(children)
