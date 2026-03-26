@@ -12,11 +12,13 @@ export async function GET(request: Request) {
   const query = `/r/${subreddit}/${sort}.json?limit=${limit}&raw_json=1`;
 
   // if direct fetch fails on Vercel, fall back to public proxies (best-effort)
+  const envProxy = process.env.REDDIT_PROXY_URL;
   const proxyPrefixes = [
-    { prefix: 'https://api.allorigins.win/raw?url=', encode: true },
-    { prefix: 'https://thingproxy.freeboard.io/fetch/', encode: true },
-    { prefix: 'https://cors.bridged.cc/', encode: false },
-  ];
+    envProxy ? { prefix: envProxy, encode: true, name: 'env proxy' } : null,
+    { prefix: 'https://thingproxy.freeboard.io/fetch/', encode: true, name: 'thingproxy' },
+    { prefix: 'https://api.allorigins.win/raw?url=', encode: true, name: 'allorigins' },
+    { prefix: 'https://cors.bridged.cc/', encode: false, name: 'cors.bridged' },
+  ].filter(Boolean) as Array<{ prefix: string; encode: boolean; name: string }>;
 
   function getUserAgent() {
     return (
