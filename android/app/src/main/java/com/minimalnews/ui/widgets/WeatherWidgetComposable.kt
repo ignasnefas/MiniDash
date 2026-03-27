@@ -318,28 +318,39 @@ fun WeatherWidgetComposable(repository: Repository) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 2.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Left: date
                         Text(
                             text = day.date.takeLast(5),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.width(48.dp)
+                            modifier = Modifier.weight(1f)
                         )
-                        Text(
-                            text = day.icon,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Text(
-                            text = "${day.low.toInt()}°/${day.high.toInt()}°",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.width(64.dp)
-                        )
+                        // Middle: icon + temp, centered
+                        Row(
+                            modifier = Modifier.weight(1.4f),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = day.icon,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = "${day.low.toInt()}°/${day.high.toInt()}°",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                        // Right: condition, right-aligned
                         Text(
                             text = day.condition,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1.4f),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.End
                         )
                     }
                 }

@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/widget_background"
     android:padding="12dp">
 
     <!-- Header -->
@@ -76,4 +75,23 @@
         android:textSize="11sp"
         android:fontFamily="monospace"
         android:paddingTop="4dp" />
+
+    <!-- 5-Day Forecast -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="5-Day Forecast"
+        android:textColor="#58A6FF"
+        android:textSize="11sp"
+        android:fontFamily="monospace"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp" />
+
+    <LinearLayout
+        android:id="@+id/forecast_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical" />
+
 </LinearLayout>

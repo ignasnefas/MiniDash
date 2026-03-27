@@ -57,6 +57,16 @@ class WeatherAppWidget : AppWidgetProvider() {
                         R.id.weather_details,
                         "Humidity ${w.current.humidity}% · Wind ${w.current.windSpeed.toInt()} km/h"
                     )
+                    
+                    // Add forecast items
+                    views.removeAllViews(R.id.forecast_container)
+                    w.forecast.take(5).forEach { day ->
+                        val forecastView = RemoteViews(context.packageName, R.layout.forecast_item)
+                        forecastView.setTextViewText(R.id.forecast_date, day.date)
+                        forecastView.setTextViewText(R.id.forecast_icon, day.icon)
+                        forecastView.setTextViewText(R.id.forecast_temp, "${day.low.toInt()}°/${day.high.toInt()}°")
+                        views.addView(R.id.forecast_container, forecastView)
+                    }
                 } catch (_: Exception) {
                     views.setTextViewText(R.id.weather_temp, "--°C")
                 }

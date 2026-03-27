@@ -4,10 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.minimalnews.data.models.Quote
 import com.minimalnews.data.repository.Repository
@@ -43,32 +45,38 @@ fun QuoteWidgetComposable(repository: Repository) {
             loading -> TerminalLoading("Fetching quote...")
             error != null -> TerminalError(error!!)
             quote != null -> {
-                Text(
-                    text = "\"${quote!!.text}\"",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontStyle = FontStyle.Italic
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Text(
+                        text = "\"${quote!!.text}\"",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontStyle = FontStyle.Italic,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                     Text(
                         text = "— ${quote!!.author ?: "Unknown"}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text(
-                        text = "[copy]",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
-                            clipboard.setText(
-                                AnnotatedString("\"${quote!!.text}\" — ${quote!!.author ?: "Unknown"}")
-                            )
-                        }
-                    )
+                        Text(
+                            text = "[copy]",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable {
+                                clipboard.setText(
+                                    AnnotatedString("\"${quote!!.text}\" — ${quote!!.author ?: "Unknown"}")
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }

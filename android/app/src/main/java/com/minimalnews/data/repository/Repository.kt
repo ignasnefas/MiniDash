@@ -34,6 +34,22 @@ class Repository(context: Context) {
         return response.body?.string() ?: throw Exception("Empty response")
     }
 
+    private fun fetchWithFallback(primaryUrl: String, fallbackUrls: List<String> = emptyList()): String {
+        val allUrls = listOf(primaryUrl) + fallbackUrls
+        var lastException: Exception? = null
+        
+        for (url in allUrls) {
+            try {
+                return fetch(url)
+            } catch (e: Exception) {
+                lastException = e
+                continue
+            }
+        }
+        
+        throw lastException ?: Exception("All fetch attempts failed")
+    }
+
     // ── Weather ──────────────────────────────────────────────────────────────
 
     suspend fun fetchWeather(location: String): WeatherData = withContext(Dispatchers.IO) {
@@ -243,19 +259,57 @@ class Repository(context: Context) {
         ids: List<String> = listOf("bitcoin", "ethereum", "solana", "dogecoin")
     ): List<CryptoPrice> = withContext(Dispatchers.IO) {
         val idsParam = ids.joinToString(",")
-        val url =
-            "https://api.coingecko.com/api/v3/simple/price?ids=$idsParam&vs_currencies=usd&include_24hr_change=true"
-        val json = JsonParser.parseString(fetch(url)).asJsonObject
+        val primaryUrl =
+            "https://api.coingecko.com/api/v3/coins/markets?ids=$idsParam&vs_currency=usd&order=market_cap_desc&price_change_percentage=24h"
+        
+        // Fallback: Try with order parameter removed in case it causes issues
+        val fallbackUrl = 
+            "https://api.coingecko.com/api/v3/coins/markets?ids=$idsParam&vs_currency=usd&price_change_percentage=24h"
+        
+        return@withContext try {
+            val json = fetchWithFallback(primaryUrl, listOf(fallbackUrl))
+            val arr = JsonParser.parseString(json).asJsonArray
 
-        json.entrySet().map { (id, value) ->
-            val obj = value.asJsonObject
-            CryptoPrice(
-                id = id,
-                symbol = id.take(4).uppercase(),
-                name = id.replaceFirstChar { it.uppercase() },
-                price = obj.get("usd")?.asDouble ?: 0.0,
-                change24h = obj.get("usd_24h_change")?.asDouble ?: 0.0
-            )
+            val result = arr.map { el ->
+                val obj = el.asJsonObject
+                CryptoPrice(
+                    id = obj.get("id").asString,
+                    symbol = obj.get("symbol").asString.uppercase(),
+                    name = obj.get("name").asString,
+                    price = obj.get("current_price")?.asDouble ?: 0.0,
+                    change24h = obj.get("price_change_percentage_24h")?.asDouble ?: 0.0
+                )
+            }
+            
+            // Save successful fetch to cache
+            try {
+                prefs.edit().putString("crypto_data_cache", json).apply()
+            } catch (_: Exception) { }
+            
+            result
+        } catch (e: Exception) {
+            // Return cached data if available, else fail with a clear error.
+            val cached = prefs.getString("crypto_data_cache", null)
+            if (cached != null) {
+                try {
+                    return@withContext JsonParser.parseString(cached).asJsonArray.map { el ->
+                        val obj = el.asJsonObject
+                        CryptoPrice(
+                            id = obj.get("id").asString,
+                            symbol = obj.get("symbol").asString.uppercase(),
+                            name = obj.get("name").asString,
+                            price = obj.get("current_price")?.asDouble
+                                ?: throw Exception("Cached item missing price"),
+                            change24h = obj.get("price_change_percentage_24h")?.asDouble
+                                ?: throw Exception("Cached item missing change24h")
+                        )
+                    }
+                } catch (cacheError: Exception) {
+                    throw Exception("Crypto fetch failed and cache is invalid: ${cacheError.message}")
+                }
+            }
+
+            throw Exception("Crypto fetch failed: ${e.message}")
         }
     }
 
