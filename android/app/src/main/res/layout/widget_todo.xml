@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="12dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="todo"
+            android:textColor="#58A6FF"
+            android:textSize="12sp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/todo_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0/0"
+            android:textColor="#8B949E"
+            android:textSize="10sp"
+            android:fontFamily="monospace"
+            android:paddingEnd="8dp" />
+
+        <TextView
+            android:id="@+id/refresh_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="↻"
+            android:textColor="#8B949E"
+            android:textSize="16sp"
+            android:padding="4dp" />
+    </LinearLayout>
+
+    <!-- Content -->
+    <TextView
+        android:id="@+id/todo_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Open app to add tasks"
+        android:textColor="#C9D1D9"
+        android:textSize="12sp"
+        android:fontFamily="monospace"
+        android:lineSpacingExtra="3dp" />
+</LinearLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MinimalNews</string>
+
+    <!-- Widget descriptions -->
+    <string name="widget_clock_desc">Terminal-style digital clock</string>
+    <string name="widget_weather_desc">Current weather with terminal aesthetic</string>
+    <string name="widget_news_desc">Latest news headlines from RSS feeds</string>
+    <string name="widget_todo_desc">Your task list at a glance</string>
+    <string name="widget_quote_desc">Daily inspirational quote</string>
+    <string name="widget_crypto_desc">Crypto prices with 24h change</string>
+    <string name="widget_hn_desc">Top stories from Hacker News</string>
+</resources>

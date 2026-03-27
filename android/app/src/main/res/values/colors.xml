@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_dark">#FF0D1117</color>
+    <color name="surface_dark">#FF161B22</color>
+    <color name="fg_dark">#FFC9D1D9</color>
+    <color name="primary_dark">#FF58A6FF</color>
+    <color name="secondary_dark">#FF8B949E</color>
+    <color name="accent_dark">#FF7EE787</color>
+    <color name="border_dark">#FF30363D</color>
+    <color name="error">#FFF85149</color>
+    <color name="warning">#FFD29922</color>
+    <color name="dot_red">#FFFF5F56</color>
+    <color name="dot_yellow">#FFFFBD2E</color>
+    <color name="dot_green">#FF27C93F</color>
+    <color name="widget_bg">#E60D1117</color>
+    <color name="widget_border">#FF30363D</color>
+</resources>
