@@ -15,6 +15,17 @@ function formatNumber(num: number): string {
   return num.toString();
 }
 
+function normalizeHashtag(name: string): string {
+  const normalized = name.replace(/^#+/, '');
+  return `#${normalized}`;
+}
+
+function normalizeTopicUrl(topic: { url?: string; name: string }) {
+  if (topic.url) return topic.url;
+  const tag = topic.name.replace(/^#+/, '');
+  return `https://x.com/hashtag/${encodeURIComponent(tag)}`;
+}
+
 export default function TrendingWidget() {
   const [trending, setTrending] = useState<SocialTrending | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,53 +82,57 @@ export default function TrendingWidget() {
         </div>
 
         {trending && activeTab === 'github' && (
-          <div className={styles.section}>
-            <ul className={styles.list}>
-              {trending.github.map((repo) => (
-                <li key={repo.name} className={styles.item}>
-                  <div className={styles.repoContent}>
-                    <a
-                      href={repo.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.repoName}
-                    >
-                      {repo.name}
-                    </a>
-                    <span className={styles.repoDesc}>{repo.description}</span>
-                    <div className={styles.repoMeta}>
-                      <span className={styles.language}>{repo.language}</span>
-                      <span className={styles.stars}>★ {formatNumber(repo.stars)}</span>
-                    </div>
+          <ul className={styles.list}>
+            {trending.github.map((repo) => (
+              <li key={repo.name} className={styles.item}>
+                <div className={styles.score}>
+                  <span className={styles.scoreValue}>★</span>
+                  <span className={styles.scoreMeta}>{formatNumber(repo.stars)}</span>
+                </div>
+                <div className={styles.repoContent}>
+                  <a
+                    href={repo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.repoName}
+                  >
+                    {repo.name}
+                  </a>
+                  <span className={styles.repoDesc}>{repo.description}</span>
+                  <div className={styles.repoMeta}>
+                    <span className={styles.language}>{repo.language}</span>
+                    <span>{formatNumber(repo.stars)} stars</span>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
 
         {trending && activeTab === 'twitter' && (
-          <div className={styles.section}>
-            <ul className={styles.list}>
-              {trending.twitter.map((topic) => (
-                <li key={topic.id} className={styles.item}>
-                  <div className={styles.content}>
-                    <a
-                      href={topic.url || `https://x.com/hashtag/${topic.name.replace('#', '')}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.hashtag}
-                    >
-                      {topic.name}
-                    </a>
-                  </div>
-                  {typeof topic.volume === 'number' && topic.volume > 0 && (
-                    <span className={styles.volume}>{formatNumber(topic.volume)} posts</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className={styles.list}>
+            {trending.twitter.map((topic) => (
+              <li key={topic.id} className={styles.item}>
+                <div className={styles.score}>
+                  <span className={styles.scoreValue}>•</span>
+                  <span className={styles.scoreMeta}>
+                    {typeof topic.volume === 'number' ? formatNumber(topic.volume) : ''}
+                  </span>
+                </div>
+                <div className={styles.content}>
+                  <a
+                    href={normalizeTopicUrl(topic)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.hashtag}
+                  >
+                    {normalizeHashtag(topic.name)}
+                  </a>
+                  <span className={styles.topicDesc}>{topic.description}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </TerminalBox>

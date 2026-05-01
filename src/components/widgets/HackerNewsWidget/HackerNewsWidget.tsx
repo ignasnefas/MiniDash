@@ -99,7 +99,7 @@ export default function HackerNewsWidget() {
 
   return (
     <TerminalBox
-      title="hackernews --stories"
+      title={`hackernews --${storyType}`}
       icon="🔶"
       status={`${stories?.length || 0} stories`}
       loading={loading}
@@ -118,45 +118,35 @@ export default function HackerNewsWidget() {
           ))}
         </div>
 
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th className={styles.thScore}>pts</th>
-              <th className={styles.thTitle}>title</th>
-              <th className={styles.thMeta}>meta</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(stories || []).map((story) => (
-              <tr key={story.id} className={styles.row}>
-                <td className={styles.score}>{formatScore(story.score)}</td>
-                <td className={styles.title}>
-                  <a
-                    href={story.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.link}
-                  >
-                    {story.title}
-                  </a>
-                  <span className={styles.domain}>({getDomain(story.url)})</span>
-                </td>
-                <td className={styles.meta}>
-                  <span className={styles.by}>{story.by}</span>
-                  <a
-                    href={`https://news.ycombinator.com/item?id=${story.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.comments}
-                  >
-                    {story.descendants}c
-                  </a>
-                  <span className={styles.time}>{timeAgo(story.time)}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className={styles.list}>
+          {(stories || []).map((story) => (
+            <li key={story.id} className={styles.item}>
+              <div className={styles.score}>
+                <span className={styles.scoreValue}>{formatScore(story.score)}</span>
+                <span className={styles.scoreArrow}>▲</span>
+              </div>
+              <div className={styles.content}>
+                <a
+                  href={story.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.title}
+                >
+                  {story.title}
+                </a>
+                <div className={styles.meta}>
+                  <span className={styles.by}>by {story.by}</span>
+                  <span>•</span>
+                  <span>{story.descendants} comments</span>
+                  <span>•</span>
+                  <span>{timeAgo(story.time)}</span>
+                  <span>•</span>
+                  <span className={styles.domain}>{getDomain(story.url)}</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </TerminalBox>
   );

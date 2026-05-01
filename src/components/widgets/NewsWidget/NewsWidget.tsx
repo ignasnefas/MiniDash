@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import type { NewsItem } from '@/types/api';
 import TerminalBox from '@/components/ui/TerminalBox';
-import TerminalList from '@/components/ui/TerminalList';
 import { useWidgetData, useWidgetProps } from '@/hooks/useWidget';
 import styles from './NewsWidget.module.css';
 
@@ -78,7 +77,30 @@ export default function NewsWidget({ category: initialCategory = 'all' }: NewsWi
           ))}
         </div>
 
-        <TerminalList items={listItems} showIndex={false} maxItems={10} />
+        <ul className={styles.list}>
+          {(news || []).slice(0, 10).map((item) => (
+            <li key={item.id} className={styles.item}>
+              <div className={styles.content}>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.title}
+                >
+                  {item.title}
+                </a>
+                <div className={styles.meta}>
+                  <span className={styles.source}>{item.source}</span>
+                  <span>•</span>
+                  <span>{timeAgo(item.publishedAt)}</span>
+                </div>
+              </div>
+              {item.category && (
+                <span className={styles.categoryTag}>[{item.category}]</span>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
     </TerminalBox>
   );

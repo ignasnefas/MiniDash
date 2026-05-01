@@ -31,108 +31,76 @@
   color: var(--accent);
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-xs);
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.table th {
-  text-align: left;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-bottom: 1px solid var(--border);
-  color: var(--muted);
-  font-weight: normal;
-  text-transform: uppercase;
-  font-size: 0.65rem;
-}
-
-.table td {
-  padding: var(--spacing-sm) var(--spacing-sm);
+.item {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
   border-bottom: 1px dashed var(--border);
-  vertical-align: top;
 }
 
-.thScore {
-  width: 50px;
-}
-
-.thMeta {
-  width: 120px;
-}
-
-.row:hover td {
-  background-color: color-mix(in srgb, var(--bg) 90%, var(--fg) 10%);
-}
-
-.rank {
-  color: var(--muted);
-  text-align: center;
+.item:last-child {
+  border-bottom: none;
 }
 
 .score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 50px;
+  font-size: var(--font-size-xs);
+}
+
+.scoreValue {
   color: var(--accent);
   font-weight: bold;
 }
 
-.title {
-  line-height: 1.4;
+.scoreArrow {
+  color: var(--success);
 }
 
-.link {
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.title {
   color: var(--fg);
   text-decoration: none;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
-.link:hover {
+.title:hover {
   color: var(--primary);
-}
-
-.domain {
-  color: var(--muted);
-  font-size: 0.65rem;
-  margin-left: var(--spacing-xs);
 }
 
 .meta {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
   color: var(--muted);
-  font-size: 0.65rem;
+}
+
+.domain {
+  color: var(--muted);
 }
 
 .by {
   color: var(--secondary);
 }
 
-.comments {
-  color: var(--info);
-  text-decoration: none;
-}
-
-.comments:hover {
-  text-decoration: underline;
-}
-
-.time {
-  color: var(--muted);
-}
-
 @media (max-width: 768px) {
-  .thMeta,
-  .meta {
-    display: none;
-  }
-  
   .domain {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .thScore,
-  .score {
     display: none;
   }
 }

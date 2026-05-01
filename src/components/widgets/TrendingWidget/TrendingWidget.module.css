@@ -30,10 +30,6 @@
   color: var(--primary);
 }
 
-.section {
-  margin-top: var(--spacing-xs);
-}
-
 .list {
   list-style: none;
   padding: 0;
@@ -42,7 +38,6 @@
 
 .item {
   display: flex;
-  align-items: flex-start;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) 0;
   border-bottom: 1px dashed var(--border);
@@ -52,60 +47,50 @@
   border-bottom: none;
 }
 
-.content {
-  flex: 1;
+.score {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
+  min-width: 48px;
+  font-size: var(--font-size-xs);
 }
 
-.hashtag {
-  color: var(--info);
+.scoreValue {
+  color: var(--accent);
   font-weight: bold;
-  text-decoration: none;
-  transition: color 0.2s ease;
 }
 
-.hashtag:hover {
-  color: var(--primary);
-}
-
-.category {
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  padding: 1px 4px;
-  border: 1px solid var(--border);
-}
-
-.volume {
+.scoreMeta {
   color: var(--secondary);
-  font-size: var(--font-size-xs);
-  margin-left: auto;
 }
 
-/* GitHub repos */
-.repoContent {
+.content {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
 }
 
+.hashtag,
 .repoName {
-  color: var(--primary);
-  font-weight: bold;
+  color: var(--fg);
   text-decoration: none;
+  font-weight: bold;
 }
 
+.hashtag:hover,
 .repoName:hover {
-  text-decoration: underline;
+  color: var(--primary);
 }
 
+.topicDesc,
 .repoDesc {
   color: var(--secondary);
   font-size: var(--font-size-xs);
   line-height: 1.4;
+}
+
+.repoDesc {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -114,26 +99,18 @@
 
 .repoMeta {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-md);
   font-size: var(--font-size-xs);
+  color: var(--muted);
 }
 
 .language {
   color: var(--accent);
 }
 
-.stars {
-  color: var(--warning);
-}
-
 @media (max-width: 480px) {
-  .volume {
-    display: none;
-  }
-  
-  .content {
+  .item {
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-xs);
   }
 }
