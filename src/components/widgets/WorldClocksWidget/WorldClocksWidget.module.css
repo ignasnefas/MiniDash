@@ -4,8 +4,18 @@
 
 .controls {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
+  align-items: center;
+}
+
+.select {
+  min-width: 12rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  padding: var(--spacing-xs) var(--spacing-sm);
 }
 
 .input {

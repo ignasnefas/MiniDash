@@ -11,12 +11,30 @@ const DEFAULT_ZONES: string[] = [
   'Asia/Tokyo',
 ];
 
+const PRESET_ZONES = [
+  { label: 'Lithuania', value: 'Europe/Vilnius' },
+  { label: 'United States (East)', value: 'America/New_York' },
+  { label: 'United States (West)', value: 'America/Los_Angeles' },
+  { label: 'Japan', value: 'Asia/Tokyo' },
+  { label: 'United Kingdom', value: 'Europe/London' },
+  { label: 'Australia', value: 'Australia/Sydney' },
+  { label: 'France', value: 'Europe/Paris' },
+  { label: 'UAE', value: 'Asia/Dubai' },
+  { label: 'Brazil', value: 'America/Sao_Paulo' },
+  { label: 'India', value: 'Asia/Kolkata' },
+];
+
 function getSupportedTimeZones() {
   if (typeof Intl?.supportedValuesOf === 'function') {
     return Intl.supportedValuesOf('timeZone');
   }
 
-  return DEFAULT_ZONES;
+  return Array.from(
+    new Set([
+      ...DEFAULT_ZONES,
+      ...PRESET_ZONES.map((option) => option.value),
+    ])
+  );
 }
 
 function normalizeTimeZone(timeZone: string) {
@@ -24,15 +42,32 @@ function normalizeTimeZone(timeZone: string) {
   if (!normalized) return null;
 
   const supportedZones = getSupportedTimeZones();
+  const lowerInput = normalized.toLowerCase();
+
   const exactMatch = supportedZones.find((zone) => zone === normalized);
   if (exactMatch) return exactMatch;
 
-  const lowerInput = normalized.toLowerCase();
   const caseInsensitiveMatch = supportedZones.find((zone) => zone.toLowerCase() === lowerInput);
   if (caseInsensitiveMatch) return caseInsensitiveMatch;
 
   const suffixMatch = supportedZones.find((zone) => zone.toLowerCase().endsWith(`/${lowerInput}`));
   if (suffixMatch) return suffixMatch;
+
+  const presetMatch = PRESET_ZONES.find(
+    (option) =>
+      option.value.toLowerCase() === lowerInput ||
+      option.label.toLowerCase() === lowerInput
+  );
+  if (presetMatch) return presetMatch.value;
+
+  const inputTokens = lowerInput.replace(/[_/]+/g, ' ').split(' ').filter(Boolean);
+  if (inputTokens.length > 0) {
+    const fuzzyMatch = supportedZones.find((zone) => {
+      const zoneTokens = zone.toLowerCase().replace(/[_/]+/g, ' ').split(' ').filter(Boolean);
+      return inputTokens.every((token) => zoneTokens.includes(token));
+    });
+    if (fuzzyMatch) return fuzzyMatch;
+  }
 
   return null;
 }
@@ -87,7 +122,21 @@ export default function WorldClocksWidget() {
   const [zones, setZones] = useState<string[]>(DEFAULT_ZONES);
   const [now, setNow] = useState<Date | null>(null);
   const [newZone, setNewZone] = useState('');
+  const [selectedPreset, setSelectedPreset] = useState(PRESET_ZONES[0].value);
   const [is24Hour, setIs24Hour] = useState(true);
+
+  const availablePresets = PRESET_ZONES.filter((option) => !zones.includes(option.value));
+
+  useEffect(() => {
+    if (availablePresets.length === 0) {
+      setSelectedPreset('');
+      return;
+    }
+
+    if (!availablePresets.some((option) => option.value === selectedPreset)) {
+      setSelectedPreset(availablePresets[0].value);
+    }
+  }, [availablePresets, selectedPreset]);
 
   useEffect(() => {
     setNow(new Date());
@@ -106,6 +155,20 @@ export default function WorldClocksWidget() {
     setNewZone('');
   };
 
+  const addPresetZone = () => {
+    if (!selectedPreset) {
+      return;
+    }
+
+    const normalized = normalizeTimeZone(selectedPreset);
+    if (!normalized) {
+      alert('Invalid preset timezone selected.');
+      return;
+    }
+
+    if (!zones.includes(normalized)) setZones(prev => [...prev, normalized]);
+  };
+
   const removeZone = (zone: string) => {
     setZones(prev => prev.filter(z => z !== zone));
   };
@@ -120,7 +183,17 @@ export default function WorldClocksWidget() {
     <TerminalBox title="clocks --world" icon="🕒" status={statusText}>
       <div className={styles.container}>
         <div className={styles.controls}>
-          <input className={styles.input} value={newZone} onChange={(e) => setNewZone(e.target.value)} placeholder="Enter timezone or city (e.g. Europe/London, Vilnius)" />
+          <select className={styles.select} value={selectedPreset} onChange={(e) => setSelectedPreset(e.target.value)} disabled={availablePresets.length === 0}>
+            {availablePresets.length > 0 ? (
+              availablePresets.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))
+            ) : (
+              <option value="">All presets added</option>
+            )}
+          </select>
+          <button className={styles.button} onClick={addPresetZone} disabled={availablePresets.length === 0}>Add preset</button>
+          <input className={styles.input} value={newZone} onChange={(e) => setNewZone(e.target.value)} placeholder="Enter a location" />
           <button className={styles.button} onClick={addZone}>Add</button>
           <button className={styles.button} onClick={() => setIs24Hour((prev) => !prev)}>
             {is24Hour ? '24h' : 'AM/PM'}
