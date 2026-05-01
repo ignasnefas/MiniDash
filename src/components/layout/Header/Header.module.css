@@ -158,6 +158,8 @@
   }
   
   .args {
-    display: none;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
   }
 }
