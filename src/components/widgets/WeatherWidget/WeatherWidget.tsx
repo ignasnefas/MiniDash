@@ -160,10 +160,10 @@ export default function WeatherWidget() {
           (error) => {
             const message = error?.message || 'Unknown geolocation error';
             console.warn('Geolocation error:', message);
-            setLocationError(`Geolocation failed: ${message}.`);
+            const isDenied = error?.code === 1 || /denied/i.test(message);
+            setLocationError(isDenied ? 'User denied geolocation' : `Geolocation failed: ${message}.`);
 
             if (!location) {
-              // Try fallback by relying on server-side IP lookup in /api/weather
               updateProps({ location: '' });
               setInputValue('');
             }
@@ -199,7 +199,7 @@ export default function WeatherWidget() {
   const status = detectingLocation
     ? 'Detecting your location...'
     : locationError
-    ? `${locationError} ${weather ? `Last updated: ${new Date(weather.lastUpdated).toLocaleTimeString()}` : ''}`
+    ? locationError
     : weather
     ? `Last updated: ${new Date(weather.lastUpdated).toLocaleTimeString()}`
     : '';

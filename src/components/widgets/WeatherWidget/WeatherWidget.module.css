@@ -112,8 +112,10 @@
 
 .forecast {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: var(--spacing-sm);
+  width: 100%;
+  justify-items: stretch;
 }
 
 .forecastDay {
@@ -124,6 +126,7 @@
   padding: var(--spacing-sm);
   border: 1px solid var(--border);
   text-align: center;
+  width: 100%;
 }
 
 .forecastDate {
@@ -169,8 +172,14 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
   .forecast {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 360px) {
+  .forecast {
+    grid-template-columns: 1fr;
   }
 }
