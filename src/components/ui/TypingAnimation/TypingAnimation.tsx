@@ -8,6 +8,7 @@ interface TypingAnimationProps {
   speed?: number;
   delay?: number;
   cursor?: boolean;
+  onUpdate?: (text: string) => void;
   onComplete?: () => void;
   className?: string;
 }
@@ -17,6 +18,7 @@ export default function TypingAnimation({
   speed = 50,
   delay = 0,
   cursor = true,
+  onUpdate,
   onComplete,
   className = '',
 }: TypingAnimationProps) {
@@ -51,8 +53,10 @@ export default function TypingAnimation({
   useEffect(() => {
     if (started && currentIndex < text.length && !timerRef.current) {
       timerRef.current = setTimeout(() => {
-        setDisplayText((prev) => prev + text[currentIndex]);
+        const nextText = text.slice(0, currentIndex + 1);
+        setDisplayText(nextText);
         setCurrentIndex((prev) => prev + 1);
+        onUpdate?.(nextText);
         timerRef.current = null;
       }, speed);
     } else if (started && currentIndex >= text.length && !isComplete) {
@@ -65,7 +69,7 @@ export default function TypingAnimation({
         timerRef.current = null;
       }
     };
-  }, [started, currentIndex, text, speed, onComplete, isComplete]);
+  }, [started, currentIndex, text, speed, onComplete, isComplete, onUpdate]);
 
   return (
     <span className={`${styles.typing} ${className}`}>

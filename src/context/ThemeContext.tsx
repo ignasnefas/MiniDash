@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark');
   const [mounted, setMounted] = useState(false);
 
-  const availableThemes = Object.keys(themes) as Theme[];
+  const availableThemes = ['dark', 'light'] as Theme[];
 
   useEffect(() => {
     setMounted(true);

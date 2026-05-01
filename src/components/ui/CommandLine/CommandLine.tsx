@@ -37,7 +37,7 @@ const COMMANDS = [
   'hackernews - Get Hacker News top stories',
   'trending - Get trending topics',
   'quote - Get random quote',
-  'theme [name] - Change theme (dark, light, retro-green, amber, blue, matrix, solarized-dark, solarized-light)',
+  'theme [name] - Change theme (dark, light)',
   'clear - Clear terminal',
   'exit - Close CLI',
   'enable [widget] - Enable/hide the widget section',
@@ -359,9 +359,14 @@ export default function CommandLine({ isOpen, onClose, onCommand }: CommandLineP
                     {item.type === 'loading' && <span className={styles.spinner}>◐</span>}
                     <TypingAnimation
                       text={item.output}
-                      speed={item.speed ?? 20}
-                      delay={item.delay ?? (item.command ? 100 : 0)}
+                      speed={item.speed ?? 10}
+                      delay={item.delay ?? (item.command ? 50 : 0)}
                       className={textClass}
+                      onUpdate={() => {
+                        if (terminalRef.current) {
+                          terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+                        }
+                      }}
                       onComplete={() => markHistoryTypingComplete(item.id)}
                     />
                   </div>
