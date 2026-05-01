@@ -46,6 +46,21 @@ const COMMANDS = [
   'list - List available widgets',
 ];
 
+const COMMAND_ALIASES: Record<string, string> = {
+  q: 'quote',
+  w: 'weather',
+  n: 'news',
+  r: 'reddit',
+  h: 'help',
+  ls: 'list',
+  t: 'trending',
+  hn: 'hackernews',
+  e: 'exit',
+};
+
+const COMMAND_NAMES = ['help', 'weather', 'news', 'reddit', 'hackernews', 'trending', 'quote', 'theme', 'clear', 'exit', 'enable', 'disable', 'toggle', 'list'];
+const WIDGET_NAMES = ['weather', 'news', 'reddit', 'hackernews', 'trending', 'quote', 'crypto', 'clocks', 'todo', 'systeminfo'];
+
 export default function CommandLine({ isOpen, onClose, onCommand }: CommandLineProps) {
   const { theme, setTheme, availableThemes } = useTheme();
   const [input, setInput] = useState('');
@@ -155,7 +170,7 @@ export default function CommandLine({ isOpen, onClose, onCommand }: CommandLineP
         return {
           ...h,
           isTypingComplete: true,
-          pending: !!h.pendingCommand,
+          pending: false,
         };
       });
       return next;
@@ -170,10 +185,11 @@ export default function CommandLine({ isOpen, onClose, onCommand }: CommandLineP
     const parts = command.trim().split(/\s+/);
     const cmd = parts[0].toLowerCase();
     const args = parts.slice(1);
+    const normalized = COMMAND_ALIASES[cmd] || cmd;
 
     // Return an object with the immediate output text and, if applicable,
     // details about an async command to run after the command is added to history.
-    switch (cmd) {
+    switch (normalized) {
       case 'help':
         return { output: COMMANDS.join('\n') };
 
@@ -255,38 +271,75 @@ export default function CommandLine({ isOpen, onClose, onCommand }: CommandLineP
     e.preventDefault();
     if (!input.trim()) return;
 
-    const command = input.trim();
-    const result = parseCommand(command);
+    const commandStrings = input.trim().split(/\s*&&\s*/).filter(Boolean);
+    for (const command of commandStrings) {
+      const result = parseCommand(command);
+      let historyId: string | null = null;
+      if (result.output) {
+        setHideInput(true);
+        setShowPlaceholder(false);
+        historyId = addToHistory(command, result.output, 'info', {
+          pending: !!result.async,
+          pendingCommand: result.async?.command,
+          pendingArgs: result.async?.args,
+        });
+      }
 
-    let historyId: string | null = null;
-    if (result.output) {
-      setHideInput(true);
-      setShowPlaceholder(false);
-      historyId = addToHistory(command, result.output, 'info');
+      if (!result.async && result.command) {
+        onCommand(result.command, result.args || []);
+      }
+
+      setCommandHistory(prev => [...prev, command]);
+      setHistoryIndex(-1);
     }
 
-    if (!result.async && result.command) {
-      onCommand(result.command, result.args || []);
-    }
-
-    if (result.async && historyId) {
-      const { command: pendingCommand, args: pendingArgs } = result.async;
-      setHistory(prev => prev.map(h => h.id === historyId ? {
-        ...h,
-        pendingCommand,
-        pendingArgs,
-      } : h));
-    }
-
-    setCommandHistory(prev => [...prev, command]);
-    setHistoryIndex(-1);
     setInput('');
-    setCurrentLine(history.length + 1);
+    setCurrentLine(prev => prev + commandStrings.length);
   };
+
+  const completeInput = useCallback(() => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    const parts = trimmed.split(/\s+/);
+    const first = parts[0].toLowerCase();
+
+    if (parts.length === 1) {
+      const candidates = [...COMMAND_NAMES, ...Object.keys(COMMAND_ALIASES)];
+      const match = candidates.find(c => c.startsWith(first));
+      if (match) {
+        const completion = COMMAND_ALIASES[match] ?? match;
+        setInput(`${completion} `);
+      }
+      return;
+    }
+
+    if (first === 'theme') {
+      const partial = parts[1].toLowerCase();
+      const match = availableThemes.find(t => t.startsWith(partial));
+      if (match) {
+        setInput(`theme ${match}`);
+      }
+      return;
+    }
+
+    if (['enable', 'disable', 'toggle'].includes(first)) {
+      const partial = parts.slice(1).join(' ').toLowerCase();
+      const match = WIDGET_NAMES.find(w => w.startsWith(partial));
+      if (match) {
+        setInput(`${first} ${match}`);
+      }
+    }
+  }, [input, availableThemes]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onClose();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      completeInput();
       return;
     }
 

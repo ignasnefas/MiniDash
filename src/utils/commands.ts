@@ -1,13 +1,102 @@
 import { apiFetch } from '@/utils/api';
 import type { ApiResponse, WeatherData, NewsItem, HackerNewsItem, TrendingTopic, QuoteOfTheDay } from '@/types/api';
 
+const WEATHER_ASCII: Record<string, string> = {
+  Clear: `
+    \\   /
+     .-.
+  ― (   ) ―
+     \'-'
+    /   \\
+`,
+  Sunny: `
+    \\   /
+     .-.
+  ― (   ) ―
+     \'-'
+    /   \\
+`,
+  'Partly cloudy': `
+   \\  /
+ _ /"".-.
+   \\_(   ).
+   /(___(__) 
+`,
+  Cloudy: `
+     .--.
+  .-(    ).
+ (___.__)__)
+`,
+  Overcast: `
+     .--.
+  .-(    ).
+ (___.__)__)
+`,
+  Rain: `
+     .--.
+  .-(    ).
+ (___.__)__)
+  ' ' ' '
+ ' ' ' '
+`,
+  'Light rain': `
+     .--.
+  .-(    ).
+ (___.__)__)
+    ' ' '
+`,
+  Snow: `
+     .--.
+  .-(    ).
+ (___.__)__)
+   * * * *
+  * * * *
+`,
+  'Light snow': `
+     .--.
+  .-(    ).
+ (___.__)__)
+    * * *
+`,
+  Thunderstorm: `
+     .--.
+  .-(    ).
+ (___.__)__)
+    ⚡⚡
+   ' ' ' '
+`,
+  Mist: `
+  _ - _ - _
+   _ - _ -
+  _ - _ - _
+`,
+  Fog: `
+  _ - _ - _
+   _ - _ -
+  _ - _ - _
+`,
+};
+
+function getWeatherAscii(condition: string): string {
+  for (const [key, art] of Object.entries(WEATHER_ASCII)) {
+    if (condition.toLowerCase().includes(key.toLowerCase())) {
+      return art;
+    }
+  }
+  return WEATHER_ASCII['Cloudy'];
+}
+
 // Utility functions for CLI commands
 export const commandUtils = {
   async fetchWeather(location: string) {
     const res: ApiResponse<WeatherData> = await apiFetch(`/api/weather?location=${encodeURIComponent(location)}`);
     if (res.data) {
       const weather = res.data;
-      return `Location: ${weather.location}\n${weather.current.temp}°C - ${weather.current.condition}\nLast updated: ${new Date(weather.lastUpdated).toLocaleString()}`;
+      const forecastLines = weather.forecast.slice(0, 3).map((day) => {
+        const date = new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' });
+        return `${date}: ${day.high}°/${day.low}° ${day.condition}`;
+      }).join('\n');
+      return `${getWeatherAscii(weather.current.condition)}\nLocation: ${weather.location}\n${weather.current.temp}°C (feels like ${weather.current.feels_like}°C)\n${weather.current.condition}\nHumidity: ${weather.current.humidity}%\nWind: ${weather.current.wind_speed} km/h ${weather.current.wind_direction}\nVisibility: ${weather.current.visibility} km\n\n3-day forecast:\n${forecastLines}\n\nLast updated: ${new Date(weather.lastUpdated).toLocaleString()}`;
     }
     throw new Error('No weather data available');
   },
