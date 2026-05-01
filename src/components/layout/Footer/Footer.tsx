@@ -8,9 +8,7 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.content}>
         <div className={styles.links}>
-          <a href="https://github.com/ignasnefas" target="_blank" rel="noopener noreferrer">[github]</a>
-          <span className={styles.separator}>│</span>
-          <a href="https://github.com/ignasnefas/MiniDash/raw/refs/heads/main/android/APK/MiniDash_Mar27.apk" className={styles.apkLink}>[download apk]</a>
+          <a href="https://github.com/neetfrog" target="_blank" rel="noopener noreferrer">[github]</a>
           <span className={styles.separator}>│</span>
           <button
             className={styles.aboutBtn}

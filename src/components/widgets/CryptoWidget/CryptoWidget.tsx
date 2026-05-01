@@ -271,8 +271,10 @@ export default function CryptoWidget() {
                     type="checkbox"
                     checked={selectedPeriods.includes(p)}
                     onChange={(e) => {
-                      if (e.target.checked) setSelectedPeriods([...selectedPeriods, p]);
-                      else setSelectedPeriods(selectedPeriods.filter(x => x !== p));
+                      setSelectedPeriods((prev) => e.target.checked
+                        ? [...prev, p]
+                        : prev.filter(x => x !== p)
+                      );
                     }}
                   /> {p}
                 </label>
@@ -313,8 +315,10 @@ export default function CryptoWidget() {
                     type="checkbox"
                     checked={selectedPeriods.includes(p)}
                     onChange={(e) => {
-                      if (e.target.checked) setSelectedPeriods([...selectedPeriods, p]);
-                      else setSelectedPeriods(selectedPeriods.filter(x => x !== p));
+                      setSelectedPeriods((prev) => e.target.checked
+                        ? [...prev, p]
+                        : prev.filter(x => x !== p)
+                      );
                     }}
                   /> {p}
                 </label>
@@ -332,38 +336,36 @@ export default function CryptoWidget() {
               return price != null;
             }).map((s) => {
               const { price, change, change1w, change1m } = getPriceData(s);
+              const periodData = {
+                '1d': change,
+                '1w': change1w,
+                '1m': change1m,
+              } as const;
+
               return (
                 <div key={s} className={styles.row}>
                   <div className={styles.symbol}>{s}</div>
                   <div className={styles.price}>{price ? `$${price.toFixed(2)}` : '—'}</div>
-                  {selectedPeriods.includes('1d') && (
-                    <div className={styles.periodValue}>
-                      <span className={styles.periodTag}>1d</span>
-                      <span className={change != null ? (change >= 0 ? styles.changeUp : styles.changeDown) : ''}>
-                        {change != null ? formatChange(change) : ''}
-                      </span>
-                    </div>
-                  )}
-                  {(selectedPeriods.includes('1w') || selectedPeriods.includes('1m')) && (
-                    <div className={styles.extraChanges}>
-                      {selectedPeriods.includes('1w') && (
-                        <div className={styles.periodValue}>
-                          <span className={styles.periodTag}>1w</span>
-                          <span className={change1w != null ? (change1w >= 0 ? styles.changeUpSmall : styles.changeDownSmall) : ''}>
-                            {change1w != null ? formatChange(change1w) : ''}
-                          </span>
-                        </div>
-                      )}
-                      {selectedPeriods.includes('1m') && (
-                        <div className={styles.periodValue}>
-                          <span className={styles.periodTag}>1m</span>
-                          <span className={change1m != null ? (change1m >= 0 ? styles.changeUpSmall : styles.changeDownSmall) : ''}>
-                            {change1m != null ? formatChange(change1m) : ''}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {(['1d', '1w', '1m'] as const).map((period) => {
+                    const value = periodData[period];
+                    const isSelected = selectedPeriods.includes(period);
+                    return (
+                      <div key={period} className={styles.periodValue}>
+                        <span className={styles.periodTag}>{period}</span>
+                        {isSelected ? (
+                          value != null ? (
+                            <span className={value >= 0 ? styles.changeUpSmall : styles.changeDownSmall}>
+                              {formatChange(value)}
+                            </span>
+                          ) : (
+                            <span className={styles.placeholder}>—</span>
+                          )
+                        ) : (
+                          <span className={styles.placeholder}>—</span>
+                        )}
+                      </div>
+                    );
+                  })}
                   {mode === 'crypto' && (
                     <button
                       className={styles.remove}

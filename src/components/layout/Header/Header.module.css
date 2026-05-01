@@ -1,34 +1,65 @@
 .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   padding: var(--spacing-lg) var(--spacing-md);
   border-bottom: 1px solid var(--border);
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
 
-.logoContainer {
-  margin-bottom: var(--spacing-md);
+.banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  max-width: var(--max-width);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.title {
+  font-size: 1.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--secondary);
+  font-size: var(--font-size-sm);
 }
 
 .logo {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  line-height: 1.1;
-  color: var(--primary);
-  margin: 0;
-  white-space: pre;
-  display: inline-block;
-  overflow-y: hidden;
-}
-
-.logoMobile {
-  display: none;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   line-height: 1.2;
   color: var(--primary);
   margin: 0;
   white-space: pre;
-  overflow-y: hidden;
+  overflow-x: auto;
+  width: min(100%, 24rem);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
 }
 
 .topControls {
@@ -36,9 +67,10 @@
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  font-size: var(--font-size-sm);
+  flex-wrap: wrap;
   padding: 0.25rem 0.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .topControls .icon {
@@ -74,7 +106,8 @@
 
 .topControls button:hover,
 .topControls .cliButton:hover,
-.topControls .smallBtn:hover {
+.topControls .smallBtn:hover,
+.pill:hover {
   background: var(--primary);
   color: var(--background);
   border-color: var(--primary);
@@ -86,12 +119,8 @@
   align-items: center;
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
+  width: 100%;
+  max-width: var(--max-width);
 }
 
 .cliButton {
@@ -109,16 +138,6 @@
 .cliButton:hover {
   background: var(--muted);
   border-color: var(--primary);
-}
-
-.helpLink {
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  text-decoration: none;
-}
-
-.helpLink:hover {
-  color: var(--primary);
 }
 
 .tagline {
@@ -142,17 +161,16 @@
   color: var(--muted);
 }
 
-.cursor {
-  color: var(--primary);
-  animation: none;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
 @media (max-width: 768px) {
+  .banner {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logo {
+    width: 100%;
+  }
+
   .tagline {
     font-size: var(--font-size-xs);
   }

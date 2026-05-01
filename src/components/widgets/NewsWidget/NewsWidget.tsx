@@ -78,7 +78,7 @@ export default function NewsWidget({ category: initialCategory = 'all' }: NewsWi
           ))}
         </div>
 
-        <TerminalList items={listItems} maxItems={10} />
+        <TerminalList items={listItems} showIndex={false} maxItems={10} />
       </div>
     </TerminalBox>
   );

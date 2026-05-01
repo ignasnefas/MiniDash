@@ -87,7 +87,7 @@
 /* Row layout changed to grid for consistent alignment */
 .row {
   display: grid;
-  grid-template-columns: 70px 1fr auto auto 30px; /* symbol | price | main change | extra changes | remove */
+  grid-template-columns: 70px minmax(90px, 1fr) 70px 70px 70px 30px;
   gap: var(--spacing-md);
   align-items: center;
 }
@@ -100,6 +100,7 @@
 
 .price {
   color: var(--fg);
+  text-align: right;
 }
 
 .changeUp {
@@ -109,11 +110,17 @@
   color: #ff7b7b;
 }
 
-.extraChanges {
+.periodValue {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  align-items: flex-end;
+  gap: 0.4rem;
+  align-items: center;
+  white-space: nowrap;
+  min-width: 70px;
+  justify-content: flex-end;
+}
+
+.placeholder {
+  color: var(--muted);
 }
 
 .changeUpSmall {
@@ -150,25 +157,6 @@
   color: var(--primary);
   margin-left: 0.75rem;
   font-family: var(--font-mono);
-}
-
-.extraChanges {
-  display: flex;
-  flex-direction: row;
-  gap: 0.6rem;
-  margin-right: 0.5rem;
-  min-width: 9rem;
-  align-items: center;
-  justify-content: flex-end;
-  /* prevent percentages from wrapping and keep label + value together */
-  white-space: nowrap;
-}
-
-.periodValue {
-  display: flex;
-  gap: 0.4rem;
-  align-items: center;
-  white-space: nowrap;
 }
 
 .periodTag {

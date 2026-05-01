@@ -52,12 +52,6 @@
   border-bottom: none;
 }
 
-.index {
-  color: var(--muted);
-  min-width: 2ch;
-  text-align: right;
-}
-
 .content {
   flex: 1;
   display: flex;

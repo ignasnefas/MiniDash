@@ -34,37 +34,9 @@ export async function GET(request: Request) {
 
   try {
     if (!location) {
-      // Try IP-based geolocation as fallback
-      const forwarded = request.headers.get('x-forwarded-for');
-      const realIp = request.headers.get('x-real-ip');
-      const ip = forwarded ? forwarded.split(',')[0] : realIp || '';
-      const ipLookupUrl = !ip || ip.startsWith('127.') || ip === '::1'
-        ? 'https://ipapi.co/json/'
-        : `https://ipapi.co/${ip}/json/`;
-
-      try {
-        const ipRes = await fetch(ipLookupUrl);
-        if (ipRes.ok) {
-          const ipData = await ipRes.json();
-          if (ipData.city && ipData.region) {
-            location = `${ipData.city}, ${ipData.region}`;
-          } else if (ipData.region && ipData.country_name) {
-            location = `${ipData.region}, ${ipData.country_name}`;
-          } else if (ipData.country_name) {
-            location = ipData.country_name;
-          }
-        } else {
-          console.warn('IP geolocation returned non-ok status:', ipRes.status, await ipRes.text().catch(()=>'<no body>'));
-        }
-      } catch (e) {
-        console.warn('IP geolocation failed:', e);
-      }
-    }
-
-    if (!location) {
-      // If IP lookup doesn't produce a city/region, fallback to default location (London)
+      // If no explicit location is provided, default to London.
+      // Avoid IP-based fallback because the public geolocation service is rate-limited.
       location = DEFAULT_LOCATION;
-      console.warn('No IP location data available, using default location:', DEFAULT_LOCATION);
     }
 
     let lat: number | null = null, lon: number | null = null, locationName = '';

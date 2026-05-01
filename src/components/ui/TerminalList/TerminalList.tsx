@@ -16,7 +16,7 @@ interface TerminalListProps {
 
 export default function TerminalList({
   items,
-  showIndex = true,
+  showIndex = false,
   maxItems = 10,
 }: TerminalListProps) {
   const displayItems = items.slice(0, maxItems);

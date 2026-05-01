@@ -22,22 +22,30 @@ export default function Header({ onOpenCli }: HeaderProps) {
 
   return (
     <header className={styles.header}>
-      <div className={styles.logoContainer}>
-        <pre className={styles.logo} aria-label="MiniDash">{ASCII_LOGO}</pre>
+      <div className={styles.banner}>
+        <div className={styles.brand}>
+          <div className={styles.titleGroup}>
+            <span className={styles.title}>MINI DASH</span>
+            <span className={styles.subtitle}>digital essentials</span>
+          </div>
+        </div>
+
+        <div className={styles.topControls}>
+          <ThemeToggle />
+          <WidgetsManager />
+          {onOpenCli && (
+            <button onClick={onOpenCli} className={styles.cliButton} aria-label="Open CLI">
+              ⌘
+            </button>
+          )}
+        </div>
       </div>
-      <div className={styles.topControls}>
-        <ThemeToggle />
-        <WidgetsManager />
-        {onOpenCli && (
-          <button onClick={onOpenCli} className={styles.cliButton} aria-label="Open CLI">
-            ⌘
-          </button>
-        )}
-      </div>
+
       <div className={styles.headerContent}>
         <ClockWidget />
         {showQuote && <QuoteWidget />}
       </div>
+
       <div className={styles.tagline}>
         <span className={styles.prompt}>$</span>
         <span className={styles.command}>fetch</span>

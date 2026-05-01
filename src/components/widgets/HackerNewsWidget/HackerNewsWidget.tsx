@@ -121,16 +121,14 @@ export default function HackerNewsWidget() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.thRank}>#</th>
               <th className={styles.thScore}>pts</th>
               <th className={styles.thTitle}>title</th>
               <th className={styles.thMeta}>meta</th>
             </tr>
           </thead>
           <tbody>
-            {(stories || []).map((story, index) => (
+            {(stories || []).map((story) => (
               <tr key={story.id} className={styles.row}>
-                <td className={styles.rank}>{index + 1}</td>
                 <td className={styles.score}>{formatScore(story.score)}</td>
                 <td className={styles.title}>
                   <a

@@ -73,9 +73,8 @@ export default function TrendingWidget() {
         {trending && activeTab === 'github' && (
           <div className={styles.section}>
             <ul className={styles.list}>
-              {trending.github.map((repo, index) => (
+              {trending.github.map((repo) => (
                 <li key={repo.name} className={styles.item}>
-                  <span className={styles.index}>{index + 1}</span>
                   <div className={styles.repoContent}>
                     <a
                       href={repo.url}
@@ -100,9 +99,8 @@ export default function TrendingWidget() {
         {trending && activeTab === 'twitter' && (
           <div className={styles.section}>
             <ul className={styles.list}>
-              {trending.twitter.map((topic, index) => (
+              {trending.twitter.map((topic) => (
                 <li key={topic.id} className={styles.item}>
-                  <span className={styles.index}>{index + 1}</span>
                   <div className={styles.content}>
                     <a
                       href={topic.url || `https://x.com/hashtag/${topic.name.replace('#', '')}`}

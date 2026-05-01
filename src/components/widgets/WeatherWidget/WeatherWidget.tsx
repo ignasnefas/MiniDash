@@ -178,8 +178,8 @@ export default function WeatherWidget() {
           }
         );
       } else {
-        // No geolocation support; fetch best effort via backend IP detection
-        setLocationError('Geolocation not supported by browser; using IP-based location fallback.');
+        // No geolocation support; fall back to the default location.
+        setLocationError('Geolocation not supported by browser; using default location fallback.');
         if (!location) {
           updateProps({ location: '' });
           setInputValue('');
