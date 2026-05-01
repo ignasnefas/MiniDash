@@ -206,7 +206,7 @@ export default function WorldClocksWidget() {
         .map((entry) => entry.zone)
     : zones;
 
-  const statusText = now ? `Updated: ${now.toLocaleTimeString()}` : 'Updated: --:--:--';
+  const statusText = now ? `Local time: ${now.toLocaleTimeString()}` : 'Local time: --:--:--';
 
   return (
     <TerminalBox title="clocks --world" icon="🕒" status={statusText}>
