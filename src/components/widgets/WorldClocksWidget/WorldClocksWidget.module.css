@@ -36,6 +36,28 @@
   align-items: center;
 }
 
+.indicator {
+  width: 1.2rem;
+  height: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-sm);
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--fg);
+}
+
+.indicator.day::before {
+  content: '☀';
+  color: hsl(45, 100%, 70%);
+}
+
+.indicator.night::before {
+  content: '☾';
+  color: hsl(223, 90%, 65%);
+}
+
 .time {
   font-family: var(--font-mono);
   font-weight: bold;
