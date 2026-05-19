@@ -1,4 +1,4 @@
-# MiniDash - Digital Essentials Hub
+# MiniDash
 
 A minimal digital essentials hub that unites all essential stuff like weather, news, social media trending, Reddit, HackerNews/Slashdot in one place, styled with a terminal/ASCII aesthetic like [wttr.in](https://wttr.in/).
 
