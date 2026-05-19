@@ -2,6 +2,8 @@
 
 A minimal digital essentials hub that unites all essential stuff like weather, news, social media trending, Reddit, HackerNews/Slashdot in one place, styled with a terminal/ASCII aesthetic like [wttr.in](https://wttr.in/).
 
+![MiniDash screenshot](src/screenshot.png)
+
 ## Features
 
 - 🌤️ **Weather Widget** - Real-time weather with ASCII art (powered by wttr.in)
